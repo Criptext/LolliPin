@@ -143,21 +143,26 @@ public abstract class AppLockActivity extends PinActivity implements KeyboardBut
         if (mType == AppLock.UNLOCK_PIN && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             mFingerprintManager = (FingerprintManager) getSystemService(Context.FINGERPRINT_SERVICE);
             mFingerprintUiHelper = new FingerprintUiHelper.FingerprintUiHelperBuilder(mFingerprintManager).build(mFingerprintImageView, mFingerprintTextView, this);
-            try {
-            if (mFingerprintManager != null && mFingerprintManager.isHardwareDetected()
-                    && mFingerprintUiHelper.isFingerprintAuthAvailable()
-                    && mLockManager.getAppLock().isFingerprintAuthEnabled()) {
-                    mFingerprintImageView.setVisibility(View.VISIBLE);
-                    mFingerprintTextView.setVisibility(View.VISIBLE);
-                    mFingerprintUiHelper.startListening();
-                } else {
+            if(mFingerprintManager == null){
+                mFingerprintImageView.setVisibility(View.GONE);
+                mFingerprintTextView.setVisibility(View.GONE);
+            } else {
+                try {
+                    if (mFingerprintManager.isHardwareDetected()
+                            && mFingerprintUiHelper.isFingerprintAuthAvailable()
+                            && mLockManager.getAppLock().isFingerprintAuthEnabled()) {
+                        mFingerprintImageView.setVisibility(View.VISIBLE);
+                        mFingerprintTextView.setVisibility(View.VISIBLE);
+                        mFingerprintUiHelper.startListening();
+                    } else {
+                        mFingerprintImageView.setVisibility(View.GONE);
+                        mFingerprintTextView.setVisibility(View.GONE);
+                    }
+                } catch (SecurityException e) {
+                    Log.e(TAG, e.toString());
                     mFingerprintImageView.setVisibility(View.GONE);
                     mFingerprintTextView.setVisibility(View.GONE);
                 }
-            } catch (SecurityException e) {
-                Log.e(TAG, e.toString());
-                mFingerprintImageView.setVisibility(View.GONE);
-                mFingerprintTextView.setVisibility(View.GONE);
             }
         } else {
             mFingerprintImageView.setVisibility(View.GONE);
